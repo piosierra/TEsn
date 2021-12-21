@@ -1,0 +1,19 @@
+
+workdir: "/home/pio/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/data2/"
+
+rule all:
+    input:
+        "report/list"
+
+
+rule sites_files:
+    input:
+        "probeLocationFile_v8.txt"
+    params:
+        dir = "/home/pio/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/data2/"
+
+    output:
+        "report/list"
+    script: 
+        "scripts/generate_chr_sites_files.R"
+
