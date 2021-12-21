@@ -1,2 +1,2 @@
 # TEsn
-Snakemake version of the TE identification and genotyping pipeline.
+Snakemake version of the TEs identification and genotyping pipeline.
