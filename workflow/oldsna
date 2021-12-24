@@ -1,0 +1,39 @@
+
+DIR = ["/home/pio/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/data2/"]
+workdir: "/home/pio/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/data2/"
+SCRIPTS = ["/home/pio/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/snakemake/TEsn/workflow/scripts/"]
+
+my_file = open("samples", "r")
+content_list = my_file.read().splitlines()
+print("The samples are: ", content_list)
+
+CHR = ["chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11",
+ "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr22", "chr23", "U_sca"]
+
+rule all:
+    input:
+        expand("{dir}sites_explored/", dir =DIR)
+
+
+rule sites_files:
+    input:
+        "probeLocationFile_v8.txt"
+    params:
+        dir = "/home/pio/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/data2/"
+
+    output:
+        expand("{dir}sites_files/sites_set_{chr}", chr=CHR, dir =DIR)
+    script: 
+        "scripts/generate_chr_sites_files.R"
+
+ 
+rule extract_data:
+    input: 
+        sites = expand("{dir}sites_files/sites_set_{chr}", chr=CHR, dir =DIR),
+        samples = {content_list},
+    output:
+        "{dir}sites_explored/{content_list}"
+    conda:
+        "/home/pio/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/snakemake/TEsn/env/pysam.yaml"
+    shell: 
+        "python /home/pio/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/snakemake/TEsn/workflow/scripts/cram_explorer.py {input.samples} {input.sites}"

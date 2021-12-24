@@ -6,10 +6,10 @@ print("------------------------------------------------------------")
 print("Working directory:")
 print(dir)
 
-if (!(file.exists("sites_files_"))) {
-    dir.create("sites_files_")
+if (!(file.exists("sites_files"))) {
+    dir.create("sites_files")
 }
-setwd("sites_files_")
+setwd("sites_files")
 
 
 colnames(sites_list) <- c("Site", "samples_list")
@@ -25,3 +25,7 @@ for (i in refs) {
  sites_set[,1] <- str_replace(sites_set[,1],":","")
  write.table(sites_set, paste0("sites_set_", str_replace(i,":","")), quote = F, col.names = F, row.names = F, sep = "\t")
 }
+
+system("find \"$(pwd)\" > ../list_sites_by_chr")
+setwd("..")
+write.table(refs, "list_of_chr", quote = F, col.names = F, row.names = F )
