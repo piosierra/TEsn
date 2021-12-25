@@ -1,42 +1,30 @@
 
-DIR = "/home/pio/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/snakemake/TEsn/workflow/"
+
 
 rule all:
     input:
-        "alldatamerged"
+        "results/alldatamerged"
 
 
-rule sites_files:
+
+rule extract_data:
     input:
-        "sites_list"
-    output:
-        "sites_files/{sites}",
-    wildcard_constraints:
-        sites="\w+",
-    shell: 
-        "mkdir -p sites_files; "                            # Creates a folder for the files
-        "awk -F\" \" '{{print ($1 FS $1)}}' {input} | "     # Duplicates the contents...
-        "sed 's/:.* / /' | "                                # ...to leave just the ref on the 1st col
-        "awk  -F\" \" '{{print $2 >\"sites_files/\"$1}}'"   # Creates one file for each of those refs
+        sites = "resources/sites_files",
+        samples = "resources/samples_files"
 
-checkpoint extract_data:
-    input:
-        "sites_files/{sites}",
-        "samples_files/{sample}.mem.crumble.cram"
     output:
-        "sites_explored/{sample}/{sample}_{sites}"
-    wildcard_constraints:
-        sites="\w+",
-        sample="\w+",
+        directory("results/sites_explored")
+    
+    conda:
+        "../env/pysam2.yaml"
+
     shell:
-        "python cram_explorer.py samples_files/{sample}.mem.crumble.cram sites_files/{sites} {sample}"
-
-directories, files = glob_wildcards("sites_explored/{dir}/{file}")
+        "python workflow/scripts/cram_explorer.py {input.sites} {input.samples} {output}"
 
 rule merge_data:
     input:
-        expand("sites_explored/{dir}/{file}", dir=directories, file=files)
+        "results/sites_explored"
     output:
-        "alldatamerged"
+        "results/alldatamerged"
     shell:
-        "{DIR}scripts/merge_data.sh sites_explored alldatamerged"
+        "workflow/scripts/merge_data.sh {input} {output}"

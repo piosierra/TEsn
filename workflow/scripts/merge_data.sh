@@ -29,5 +29,6 @@ cd ../merge
 for f in *; do
     sed -i "s/$/\t$f/" $f
     done
-
-cat * > "../"$2
+pwd
+ls
+cat * > "../../"$2
