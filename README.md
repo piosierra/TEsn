@@ -11,3 +11,15 @@ awk -F" " '{print ($1 FS $1)}' sites_list | sed 's/:.* / /' | awk  -F" " '{print
 - 
 
 snakemake -d "$HOME/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/data2/" -c1
+
+Fields of alldatamerge:
+ref
+start
+end
+total_reads
+m_reads
+clips_r
+clips_l
+consensus_l
+consensus_r
+

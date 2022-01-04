@@ -21,6 +21,7 @@ for d in */ ; do
     cd $d
     echo "$d"
     for f in *; do
+        sed -i '1d' $f #removes header of each file. Needs to be ad later when they are read.
         cat * > "../../merge/"${d::-1}
     done    
     cd ..
@@ -28,6 +29,7 @@ done
 cd ../merge
 for f in *; do
     sed -i "s/$/\t$f/" $f
+
     done
 pwd
 ls
