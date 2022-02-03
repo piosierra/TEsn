@@ -1,5 +1,5 @@
 
-
+# Short reads discordant sites exploration
 
 rule all:
     input:
