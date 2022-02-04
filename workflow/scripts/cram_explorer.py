@@ -123,7 +123,7 @@ for sample in samples:
                 if len(s_r)>0:
                     consensus_r = silly_consensus(s_r)
                 data.append([c,s,e,total_reads,reads_m,clips_r,clips_l,consensus_l, consensus_r])   
-            print(data) 
+            # print(data) 
             df = pd.DataFrame(data, columns=["ref", "start", "end", "total_reads",
                                             "m_reads", "clips_r", "clips_l", 
                                             "consensus_l", 
