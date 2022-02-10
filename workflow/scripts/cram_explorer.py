@@ -5,7 +5,7 @@
 
 import sys
 import os
-print(os.environ["CONDA_PREFIX"])
+# print(os.environ["CONDA_PREFIX"])
 import pysam
 import pandas as pd
 
@@ -21,7 +21,6 @@ def most_freq_char(chars):
     for c in chars:
         dictionary[c]+=1
     return sorted(dictionary.items(), key=lambda item: item[1])[-1][0]
-  
     
 # Returns the consensus of several strings. Uses the same dictionary as them.
   
@@ -41,41 +40,23 @@ def silly_consensus(seq_list):
         
 output_path = "sites_explored"
 
-print("START...")
-print(os.getcwd())
-
-
-# print([x for x in snakemake.input if not search("cram",x)])
-# sample = snakemake.input.sample[0]
-# sites_f = snakemake.input.site[0]
-
 samples_path = sys.argv[2]
 sites_path = sys.argv[1]
 output_path = sys.argv[3]
-
-print(samples_path)
-print(sites_path)
-print(output_path)
-print(".....")
 
 with open(sites_path) as f:
     sites_files = f.read().splitlines()
 
 with open(samples_path) as f:
     samples = f.read().splitlines()
-print(samples)
-print(".....")
 if not os.path.exists(output_path):
-    print(os.getcwd())
-    print(os.listdir())
-   # os.mkdir("results")
     os.makedirs(output_path)
-    print("results created")
-    print(os.listdir())
+
 
 
 for sample in samples:
-    print("Sample: ", sample)
+    print("Processing sample:")
+    print('\033[94m'+sample[sample.rindex('/')+1:]+'\033[0m')
 
     sample_file = pysam.AlignmentFile(sample.split()[0], "rc")
     sample_id = sample.split()[1]
@@ -84,17 +65,16 @@ for sample in samples:
 
 
     for sites_f in sites_files:
-        print("Sites_files: ", sites_files)
-        print("Sites: ", sites_f)
-        print(os.getcwd())
+        print("Procesing sites file:")
+        print('\033[96m'+sites_f[sites_f.rindex('/')+1:]+'\033[0m')
         with open(sites_f) as sites:
             data = []
             c = ""
             for site in sites:
-                print("Site: ", site)
+              #  print("Site: ", site)
                 site = site.strip()
                 c,s,e = re.split('[:|-]',site)
-                print(c,s,e)
+              #  print(c,s,e)
                 iter = sample_file.fetch(region = site)
                 start = int(s)
                 end = int(e)

@@ -27,6 +27,6 @@ clips_l
 consensus_l
 consensus_r
 
-snakemake -d "$HOME/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/data2/" -c1
+snakemake --use-conda -c1
 
 ```
