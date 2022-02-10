@@ -13,9 +13,17 @@ awk -F" " '{print ($1 FS $1)}' sites_list | sed 's/:.* / /' | awk  -F" " '{print
 Create yaml for conda env:
 `conda env export > env.yaml`
 
-
+Run snakemake
+```
 snakemake -c1 --use-conda
-
+snakemake --jobs 100 \
+          --cluster "sbatch \
+          -J sn1 \
+          -A DURBIN-SL2-CPU \
+          -p cclake \
+          --time 29:00:00" \
+          --use-conda &
+```
 Fields of alldatamerge:
 ref
 start
