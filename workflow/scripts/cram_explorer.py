@@ -4,9 +4,11 @@
 # sequence of the edges of clipped reads.
 
 import sys
+import os
+print(os.environ["CONDA_PREFIX"])
 import pysam
 import pandas as pd
-import os
+
 import re
 from re import search
 # from spoa import poa
@@ -55,8 +57,12 @@ print(samples_path)
 print(sites_path)
 print(output_path)
 print(".....")
-sites_files = os.listdir(sites_path)
-samples = [f for f in os.listdir(samples_path) if f.endswith('.cram')]
+
+with open(sites_path) as f:
+    sites_files = f.read().splitlines()
+
+with open(samples_path) as f:
+    samples = f.read().splitlines()
 print(samples)
 print(".....")
 if not os.path.exists(output_path):
@@ -71,8 +77,8 @@ if not os.path.exists(output_path):
 for sample in samples:
     print("Sample: ", sample)
 
-    sample_file = pysam.AlignmentFile("resources/samples_files/"+sample, "rc")
-    sample_id = sample.split('.')[0]
+    sample_file = pysam.AlignmentFile(sample.split()[0], "rc")
+    sample_id = sample.split()[1]
 
 
 
@@ -81,7 +87,7 @@ for sample in samples:
         print("Sites_files: ", sites_files)
         print("Sites: ", sites_f)
         print(os.getcwd())
-        with open("resources/sites_files/"+sites_f) as sites:
+        with open(sites_f) as sites:
             data = []
             c = ""
             for site in sites:

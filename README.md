@@ -8,10 +8,13 @@ Snakemake version of the TEs identification and genotyping pipeline.
 ```
 mkdir -p sites_files
 awk -F" " '{print ($1 FS $1)}' sites_list | sed 's/:.* / /' | awk  -F" " '{print $2 >"sites_files/"$1}'
+```
 
-snakemake -d "$HOME/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/data2/" -c1
+Create yaml for conda env:
+`conda env export > env.yaml`
 
-snakemake -d "$HOME/rds/rds-durbin-group-8b3VcZwY7rY/projects/cichlid/pio/data2/" -c1
+
+snakemake -c1 --use-conda
 
 Fields of alldatamerge:
 ref

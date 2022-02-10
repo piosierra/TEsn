@@ -9,14 +9,14 @@ rule all:
 
 rule extract_data:
     input:
-        sites = "resources/sites_files",
-        samples = "resources/samples_files"
+        sites = "resources/sites_files.fofn",
+        samples = "resources/samples_files.fofn"
 
     output:
         directory("results/sites_explored")
     
     conda:
-        "../env/pysam2.yaml"
+        "envs/biopio.yaml"
 
     shell:
         "python workflow/scripts/cram_explorer.py {input.sites} {input.samples} {output}"
