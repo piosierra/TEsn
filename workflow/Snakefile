@@ -9,8 +9,8 @@ rule all:
 
 rule extract_data:
     input:
-        sites = "resources/sites_files.fofn",
-        samples = "resources/samples_files.fofn"
+        sites = "resources/sites_files_full.fofn",
+        samples = "resources/samples_files_full.fofn"
 
     output:
         directory("results/sites_explored")

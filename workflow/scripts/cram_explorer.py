@@ -52,7 +52,7 @@ with open(samples_path) as f:
 if not os.path.exists(output_path):
     os.makedirs(output_path)
 
-
+os.chdir(output_path)  
 
 for sample in samples:
     print("Processing sample:")
@@ -60,63 +60,65 @@ for sample in samples:
 
     sample_file = pysam.AlignmentFile(sample.split()[0], "rc")
     sample_id = sample.split()[1]
-
-
-
+    if not os.path.exists(sample_id):
+        os.makedirs(sample_id)  
+    os.chdir(sample_id)  
 
     for sites_f in sites_files:
         print("Procesing sites file:")
         print('\033[96m'+sites_f[sites_f.rindex('/')+1:]+'\033[0m')
-        with open(sites_f) as sites:
-            data = []
-            c = ""
-            for site in sites:
-              #  print("Site: ", site)
-                site = site.strip()
-                c,s,e = re.split('[:|-]',site)
-              #  print(c,s,e)
-                iter = sample_file.fetch(region = site)
-                start = int(s)
-                end = int(e)
-                s_l = []
-                s_r = []
-                consensus_l = "-"
-                consensus_r = "-"
-                reads_m = 0   # Total full M reads
-                clips_l = 0   # Total S+H left clips (at the right of the insertion)
-                clips_r = 0   # Total S+H right clips (at the left of the insertion)
-                total_reads = 0     # Total # of reads
-                for x in iter:
-                    total_reads +=1
-                    if x.cigartuples is not None:
-                        if (x.cigartuples[0][0] == 0 and x.cigartuples[-1][0] == 0 \
-                            and x.get_reference_positions()[0] < start and x.get_reference_positions()[-1] > end):                      
-                            reads_m +=1
-                        elif (x.cigartuples[0][0] == 5 or x.cigartuples[0][0] == 4) \
-                            and x.cigartuples[-1][0]!= 4 and x.cigartuples[-1][0]!= 5 \
-                            and  x.reference_start > start-2 \
-                            and x.reference_start < end+2 :
-                            s_r.append(x.query_sequence[0:x.cigartuples[0][1]][::-1])            
-                            clips_l +=1
-                        elif (x.cigartuples[-1][0] == 5 or x.cigartuples[-1][0] == 4) \
-                            and x.cigartuples[0][0]!= 4 and x.cigartuples[0][0]!= 5 \
-                            and (x.reference_start + x.cigartuples[0][1]) > start-2 \
-                            and (x.reference_start + x.cigartuples[0][1]) < end+2 :
-                            s_l.append(x.query_sequence[-x.cigartuples[-1][1]:])  
-                            clips_r +=1
-                if len(s_l)>0:
-                    consensus_l = silly_consensus(s_l)
-                if len(s_r)>0:
-                    consensus_r = silly_consensus(s_r)
-                data.append([c,s,e,total_reads,reads_m,clips_r,clips_l,consensus_l, consensus_r])   
+        print(os.path.isfile(sample_id+"_"+sites_f[sites_f.rindex('/')+1:]))
+        if not os.path.isfile(sample_id+"_"+sites_f[sites_f.rindex('/')+1:]):  
+            with open(sites_f) as sites:
+                data = []
+                c = ""
+                for site in sites:
+                #  print("Site: ", site)
+                    site = site.strip()
+                    c,s,e = re.split('[:|-]',site)
+                #  print(c,s,e)
+                
+                    iter = sample_file.fetch(region = site)
+                    start = int(s)
+                    end = int(e)
+                    s_l = []
+                    s_r = []
+                    consensus_l = "-"
+                    consensus_r = "-"
+                    reads_m = 0   # Total full M reads
+                    clips_l = 0   # Total S+H left clips (at the right of the insertion)
+                    clips_r = 0   # Total S+H right clips (at the left of the insertion)
+                    total_reads = 0     # Total # of reads
+                    for x in iter:
+                        total_reads +=1
+                        if x.cigartuples is not None:
+                            if (x.cigartuples[0][0] == 0 and x.cigartuples[-1][0] == 0 \
+                                and x.get_reference_positions()[0] < start and x.get_reference_positions()[-1] > end):                      
+                                reads_m +=1
+                            elif (x.cigartuples[0][0] == 5 or x.cigartuples[0][0] == 4) \
+                                and x.cigartuples[-1][0]!= 4 and x.cigartuples[-1][0]!= 5 \
+                                and  x.reference_start > start-2 \
+                                and x.reference_start < end+2 :
+                                s_r.append(x.query_sequence[0:x.cigartuples[0][1]][::-1])            
+                                clips_l +=1
+                            elif (x.cigartuples[-1][0] == 5 or x.cigartuples[-1][0] == 4) \
+                                and x.cigartuples[0][0]!= 4 and x.cigartuples[0][0]!= 5 \
+                                and (x.reference_start + x.cigartuples[0][1]) > start-2 \
+                                and (x.reference_start + x.cigartuples[0][1]) < end+2 :
+                                s_l.append(x.query_sequence[-x.cigartuples[-1][1]:])  
+                                clips_r +=1
+                    if len(s_l)>0:
+                        consensus_l = silly_consensus(s_l)
+                    if len(s_r)>0:
+                        consensus_r = silly_consensus(s_r)
+                    data.append([c,s,e,total_reads,reads_m,clips_r,clips_l,consensus_l, consensus_r])   
             # print(data) 
             df = pd.DataFrame(data, columns=["ref", "start", "end", "total_reads",
                                             "m_reads", "clips_r", "clips_l", 
                                             "consensus_l", 
                                             "consensus_r"])
-            os.chdir(output_path)   
-            if not os.path.exists(sample_id):
-                os.makedirs(sample_id)     
-            os.chdir(sample_id)                             
+ 
+                           
             df.to_csv(sample_id+"_" + c, sep="\t", index=False)
-            os.chdir("../../..")
+        
+    os.chdir("..")
